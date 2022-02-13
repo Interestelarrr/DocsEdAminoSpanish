@@ -4,7 +4,7 @@
     * [Enviar gif](#send-gif)
     * [Enviar sticker](#send-sticker)
     * [Enviar embed](#send-embed)
-    * [Esperar pr](#wait-for)
+    * [Esperar por](#wait-for)
 
 * [Eventos](#event)
     * [on_ready](#on-ready-event)
