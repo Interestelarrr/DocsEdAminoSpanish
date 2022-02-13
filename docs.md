@@ -5,6 +5,8 @@
     * [Enviar sticker](#send-sticker)
     * [Enviar embed](#send-embed)
     * [Esperar por](#wait-for)
+    * [Escritura y grabación simuladas](#typing-bot)
+    * [Cómo mencionar a un usuario en una sala de chat](#mention-chat)
 
 * [Eventos](#event)
     * [on_ready](#on-ready-event)
@@ -13,6 +15,8 @@
 
 * [Capacidades de comando del decorador](#command)
     * [Parámetros Adicionales](#command-parameters)
+    * [Puedes reservar varios comandos](#command-reserve)
+    * [Prefijo (Prefix)](#prefix)
 
 <br><br>
 
@@ -131,6 +135,42 @@ async def on_check(ctx: Context):
 bot.start()
 ```
 
+## Escritura y grabación simuladas <a id=typing-bot>
+```py
+from edamino import Bot, Context
+from edamino.objects import Message
+from asyncio import sleep
+
+bot = Bot('correo', 'contraseña', 'prefix')
+
+@bot.command('typing')
+async def on_typing(ctx: Context):
+    async with ctx.typing():
+        await sleep(3)
+        await ctx.reply('✔')
+
+@bot.command(['rec', 'recording'])
+async def on_ping(ctx: Context):
+    async with ctx.recording():
+        await sleep(3)
+        await ctx.reply('🎁')
+
+bot.start()
+```
+
+## Cómo mencionar a un usuario en una sala de chat <a id=mention-chat>
+```py
+from edamino import Bot, Context
+
+bot = Bot('email', 'password', 'prefix')
+
+@bot.command('mention')
+async def on_m(ctx: Context):
+    await ctx.reply(f'<$@{ctx.msg.author.nickname}$>', mentions=[ctx.msg.uid])
+
+bot.start()
+```
+
 # Eventos <a id=event>
 
 ## `on_ready` <a id=on-ready-event>
@@ -185,7 +225,7 @@ bot = Bot(correo='correo', contraseña='contraseña', prefix="/")
 # Este evento aceptará absolutamente todo tipo de mensajes.
 @bot.event(message_types=api.MessageType.ALL, media_types=api.MediaType.ALL)
 async def on_message(ctx: Context):
-    logger.info(str(ctx.msg.content))
+    print(ctx.msg)
 
 
 # Este evento se activará si alguien ha ingresado a la sala de chat.
@@ -218,7 +258,7 @@ async def on_say(ctx: Context, args: str)
 
 
 @bot.command('get')
-async def on_send(ctx: Context, link: str):
+async def on_get(ctx: Context, link: str):
     """
     User: get https://aminoapps/c/anime
     Bot: Community id
@@ -227,6 +267,39 @@ async def on_send(ctx: Context, link: str):
 
     await ctx.reply(str(info.community.ndcId))
 
+
+bot.start()
+```
+
+## Puedes reservar varios comandos <a id=command-reserve>
+
+```py
+from edamino import Bot, Context
+
+bot = Bot(email='email', password='password', prefix="/")
+
+@bot.commnad(['play', 'p'])
+async def on_example(ctx: Context):
+    await ctx.reply('Good! 🎉')
+
+bot.start()
+```
+
+
+## Prefijo (Prefix) <a id=prefix>
+**NOTA: Puede hacer un prefijo separado para su comando.**
+```py
+from edamino import Bot, Context
+
+bot = Bot(email='email', password='password', prefix="/")
+
+@bot.commnad('println(', prefix='System.out.')
+async def on_print(ctx: Context, args: str):
+    """
+    User: System.out.println(lala)
+    Bot: lala
+    """
+    await ctx.reply(args.replace(')'))
 
 bot.start()
 ```
